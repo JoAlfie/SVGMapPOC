@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+
+  <style>
+    .wrapper {
+      padding: 10px;
+    }
+
+    .one {
+      fill: red;
+    }
+
+    .one:hover {
+      fill: blue;
+    }
+
+    .two {
+      fill: green;
+    }
+
+    .two:hover {
+      fill: yellow;
+    }
+
+    .three {
+      fill: white;
+    }
+
+    .three:hover {
+      fill: #bada55;
+    }
+
+    a:focus .one,
+    a:focus .two,
+    a:focus .three {
+      stroke: black;
+      stroke-width: 2px;
+    }
+
+    .box[aria-hidden="true"] {
+      display: none;
+    }
+
+    .box span[aria-hidden="true"] {
+      display: none;
+    }
+  </style>
+
+  <div id="vue-map">
+    <vue-map area-list-json='{"areas": [{"id": "area-1", "text": "Area One"}, {"id": "area-2", "text": "Area Two"}, {"id": "area-3", "text": "Area three"}]}'></vue-map>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+
+  <script>
+    const VueMap = Vue.component('vue-map', 
+    {
+      props: {
+        areaListJson: {
+          type: String,
+          required: true,
+        }
+      },
+
+      data() {
+        return {
+          selectedArea: '',
+          parsedAreaLists: JSON.parse(this.areaListJson),
+        };
+      },
+
+      computed: {
+        boxOpen() {
+          return this.selectedArea != '';
+        }
+      },
+
+      mounted() {
+        document.addEventListener('click', this.handleDocumentClick);
+      },
+
+      methods: {
+        handleDocumentClick(e) {
+          const clickIsInside = this.$el === e.target || this.$el.contains(e.target);
+
+          if (!clickIsInside) {
+            this.selectedArea = '';
+          }
+        },
+
+        selectArea(e) {
+          const id = e.target.getAttribute('data-id') || e.target.parentElement.getAttribute('data-id');
+
+          this.selectedArea = id || '';
+        }
+      },
+
+      template: `
+      <div class="wrapper">
+        <svg version="1.1"
+          width="300" height="200"
+          xmlns="http://www.w3.org/2000/svg"
+          id="svg-map">
+
+          <a xlink:href="#area-1" data-id="area-1" v-on:click.prevent="selectArea" role="button">
+            <rect width="100%" height="100%" class="target one" />
+          </a>
+
+          <a xlink:href="#area-2" data-id="area-2" v-on:click.prevent="selectArea" role="button">
+            <circle cx="150" cy="100" r="80" class="target two" />
+          </a>
+
+          <a xlink:href="#area-3" data-id="area-3" v-on:click.prevent="selectArea" role="button">
+            <text x="150" y="125" font-size="60" text-anchor="middle" class="target three">SVG</text>
+          </a>
+
+        </svg>
+
+        <div 
+          id="box" 
+          class="box" 
+          :aria-hidden="!boxOpen"
+          tabindex="-1"
+          ref="box">
+          <span 
+            v-for="areaList in parsedAreaLists.areas" 
+            :key="areaList.id" 
+            :id="areaList.id" 
+            :aria-hidden="areaList.id != selectedArea"
+          >
+            <span>{{ areaList.text }}</span>
+          </span>
+        </div>
+      </div>
+      `
+    });
+
+    const app = new Vue({
+      el: '#vue-map',
+      components: {
+        'vue-map': VueMap,
+      }
+    })
+  </script>
+</body>
+</html>
