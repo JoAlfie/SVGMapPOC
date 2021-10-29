@@ -124,12 +124,17 @@
 
           this.selectedArea = id || '';
         },
+
+        toggleView() {
+          this.mapView = !this.mapView;
+          this.selectedArea = '';
+        }
       },
 
       template: `
       <div class="wrapper">
         <h2>Find your data centre</h2>
-        <button class="switch-button" v-on:click="mapView = !mapView" :aria-label="mapView ? 'Show List View' : 'Show Map View'">
+        <button class="switch-button" v-on:click="toggleView" :aria-label="mapView ? 'Show List View' : 'Show Map View'">
           <span 
             class="switch-button__blob"
             :class="{'switch-button__blob--right': !mapView}"
